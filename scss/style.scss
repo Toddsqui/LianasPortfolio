@@ -1,0 +1,444 @@
+@import "compass/css3";
+
+@font-face {
+  src: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/142996/pirou.otf');
+  font-family: pirou;
+}
+*, *:before, *:after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+$red: #F44336;
+$pirou: pirou, Helvetica, Arial, sans-serif;
+$openSans: 'Open Sans', Helvetica, Arial, sans-serif;
+$level1Elems: 6;
+$level1Angle: 360deg / $level1Elems;
+$level1Z: 0 - $level1Elems * 15vw;
+html, body {
+  height: 100%;
+  font-size: 62.5%;
+  overflow: hidden;
+  
+  @media (max-width: 992px) {
+    font-size: 50%;
+  }
+}
+body {
+  background: lightseagreen;
+  //background: #cfcfcf;
+}
+.shake {
+  animation: shake 0.5s infinite;
+}
+.instant-transition {
+  transition: 0s 0s !important;
+}
+.scene {
+  z-index: 1;
+  position: relative;
+  height: 100%;
+  perspective: 200vw;
+  
+  &.content-visible {
+    z-index: 11;
+  }
+}
+.level {
+  z-index: 2;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.7s;
+  transform-style: preserve-3d;
+  
+  @for $i from 1 through 5 {
+    &.level-#{$i} {
+      top: ($i - 1) * 150%;
+    }
+  }
+}
+/*
+originally .rotater was 80% width and 100% height and all was ok
+until i checked demo in FF...
+i even tried SO http://stackoverflow.com/questions/28751990/firefox-bug-with-multiple-nested-z-index-elements-and-preserve-3d
+but then i came up with hack. I made .rotater 2px width/height and placed child element with vw/vh units and negative left/top. At least now it works in FF
+*/
+.rotater {
+  z-index: 3;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  height: 2px;
+  transition: transform 0.7s;
+  transform-style: preserve-3d;
+}
+.elem {
+  z-index: 4;
+  position: absolute;
+  top: calc(-50vh - 1px);
+  left: calc(-40vw - 1px);
+  width: calc(80vw + 2px);
+  height: calc(100vh + 2px);
+  transition: transform 1s;
+  backface-visibility: hidden;
+  font-size: 5rem;
+  text-align: center;
+  transform-style: preserve-3d;
+  
+  &.full-screen {
+    left: calc(-50vw - 1px);
+    width: calc(100vw + 2px);
+  }
+  
+  &.content-visible {
+    
+    .inner {
+      z-index: 20;
+      
+      .art-fullName {
+        transform: scale(1);
+      }
+      .art-text {
+        transform: scale(1);
+        opacity: 1;
+        transition: transform 0.5s 0.2s, opacity 0.5s 0.2s;
+      }
+      .art-close {
+        transform: rotate(45deg);
+        transition: transform 0.5s 0.4s, opacity 0.3s;
+      }
+      
+      .art-btn,
+      .art-heading {
+        display: none;
+      }
+    }
+  }
+  
+  &:not(.active):hover {
+    cursor: pointer;
+  }
+
+  @for $i from 1 through $level1Elems {
+    &:nth-child(#{$i}) {
+      transform: rotateY(0 - ($i - 1) * $level1Angle) translateZ($level1Z);
+    }
+  }
+}
+
+.inner {
+  z-index: 5;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #EEEEEE;
+  //background: #888;
+  transition: transform 0.3s;
+  box-shadow: 1.2rem 2rem 2rem rgba(0,0,0,0.3);
+  
+  &.inner-1 {
+    background: rgb(229, 115, 115);
+  }
+  &.inner-2 {
+    background: rgb(186, 104, 200);
+  }
+  &.inner-3 {
+    background: rgb(238,238,238);
+  }
+  &.inner-4 {
+    background: rgb(66, 165, 245);
+  }
+  &.inner-5 {
+    background: rgb(38, 198, 218);
+  }
+  &.inner-6 {
+    background: rgb(102, 187, 106);
+  }
+  &.inner-7 {
+    background: rgb(255, 167, 38);
+  }
+  &.inner-8 {
+    background: rgb(96, 125, 139);
+  }
+  &.inner-9 {
+    background: rgb(121, 85, 72);
+  }
+  &.inner-10 {
+    background: rgb(103, 58, 183);
+  }
+  
+  
+  &.clicked {
+    transform: translateZ(15vw);
+    
+    .art-heading {
+      transform: scale(0.01);
+    }
+    .art-btn {
+      transform: translateX(-50%) translateY(-50%) scale(0.01);
+    }
+  }
+  
+  &:not(.clicked):hover {
+    transform: translateZ(5vw);
+  }
+}
+.art-heading {
+  margin-top: 1rem;
+  font-family: $openSans;
+  text-transform: uppercase;
+  font-size: 6rem;
+  transition: transform 0.3s;
+}
+.art-btn {
+  position: absolute;
+  z-index: 6;
+  top: 50%;
+  left: 50%;
+  width: 80%;
+  height: 10rem;
+  overflow: hidden;
+  transform: translateX(-50%) translateY(-50%);
+  display: block;
+  outline: none;
+  border: 0.5rem solid;
+  background: transparent;
+  font-size: 5rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  
+  &:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: -0.5rem;
+    left: -45%;
+    width: 30%;
+    height: calc(100% + 1rem);
+    transform: skewX(-30deg);
+    background: linear-gradient(to right, rgba(229, 172, 142, 0), rgba(255,255,255,0.5) 50%, rgba(229, 172, 142, 0));
+  }
+  
+  &:hover {
+    background-color: #000;
+    border-color: #000;
+    color: #fff;
+    
+    &:after {
+      animation: shine 1.2s;
+    }
+  }
+}
+.art-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  padding: 3rem;
+  text-align: left;
+  
+  &.visible {
+    display: block;
+  }
+}
+.art-fullName {
+  font-size: 8rem;
+  font-family: $pirou;
+  transform: translateX(-150%) translateY(-150%) scale(0.5);
+  transition: transform 0.3s;
+}
+.art-text {
+  font-size: 3rem;
+  font-family: $openSans;
+  transform: scale(0.1);
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  transform-origin: 50% 100%;
+}
+.art-close {
+  position: absolute;
+  top: -1.8rem;
+  right: 0.5rem;
+  transform: translateX(150%) translateY(-150%) scale(0.5);
+  transition: transform 0.3s;
+  
+  &:hover {
+    opacity: 0.5;
+  }
+  
+  &:before {
+    content: "+";
+    font-size: 8rem;
+    font-family: $openSans;
+    cursor: pointer;
+  }
+}
+.svg-matter {
+  z-index: 10;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  
+  &.above {
+    z-index: 30;
+  }
+}
+.nav-top {
+  z-index: 10;
+  position: fixed;
+  width: 100%;
+  top: 1rem;
+  left: 0;
+  text-align: center;
+  
+  @media (max-width: 992px) {
+    top: 0.2rem;
+  }
+  
+  &__heading {
+    font-size: 4rem;
+    line-height: 4rem;
+    font-family: $pirou;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  
+  &__pagination {
+    display: inline-block;
+    vertical-align: top;
+    overflow: hidden;
+    height: 4rem;
+    
+    .level-pagi {
+      transition: transform 0.3s;
+    }
+  }
+  
+  &__btn {
+    display: inline-block;
+    vertical-align: top;
+    transition: color 0.3s;
+    cursor: pointer;
+    line-height: 4rem;
+    user-select: none;
+    
+    &:hover {
+      color: $red;
+    }
+    
+    &.up {
+      font-size: 5rem;
+    }
+  }
+}
+.nav-bot {
+  z-index: 10;
+  position: fixed;
+  width: 100%;
+  bottom: 1rem;
+  left: 0;
+  transition: transform 0.2s cubic-bezier(.72,.17,.68,1.46);
+  text-align: center;
+  
+  @media (max-width: 992px) {
+    bottom: 0.2rem;
+  }
+  
+  &.inactive {
+    transform: scale(0.01);
+  }
+  
+  span {
+    display: inline-block;
+  }
+  
+  &__btn {
+    width: 2rem;
+    height: 2rem;
+    border: 0.4rem solid #fff;
+    border-left: none;
+    border-bottom: none;
+    transition: border-color 0.3s;
+    cursor: pointer;
+    user-select: none;
+    
+    &.left {
+      transform: translateY(-0.2rem) rotate(-135deg);
+    }
+    &.right {
+      transform: translateY(-0.2rem) rotate(45deg);
+    }
+    
+    &:hover {
+      border-color: $red;
+    }
+  }
+  
+  &__pagi {
+    position: relative;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    margin: 0 0.2rem;
+    transition: border-color 0.3s, background-color 0.3s;
+    cursor: pointer;
+    
+    &:hover {
+      border-color: $red;
+    }
+    
+    &.active {
+      background: #fff;
+    }
+  }
+}
+
+@keyframes shake {
+  5% {
+    transform: translateX(-1%) translateY(1%);
+  }
+  15% {
+    transform: translateX(1%) translateY(-1%);
+  }
+  25% {
+    transform: translateX(-1%) translateY(-1%);
+  }
+  35% {
+    transform: translateX(1%) translateY(1%);
+  }
+  45% {
+    transform: translateX(-1%) translateY(1%);
+  }
+  55% {
+    transform: translateX(1%) translateY(-1%);
+  }
+  65% {
+    transform: translateX(-1%) translateY(-1%);
+  }
+  75% {
+    transform: translateX(1%) translateY(1%);
+  }
+  85% {
+    transform: translateX(-1%) translateY(1%);
+  }
+  95% {
+    transform: translateX(1%) translateY(-1%);
+  }
+}
+
+@keyframes shine {
+  to {
+    transform: skewX(-30deg) translateX(600%);
+  }
+}
